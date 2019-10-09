@@ -45,6 +45,7 @@ class TURBID(data.Dataset):
             for sd in sds:
                 blurred = cv2.GaussianBlur(gray,(21,21),sd)
                 imgs.append(blurred)
+            print('4 blurred images created with stds:',sds)
 
             # get feature points
             fps_str = data_dir + '/fps_'+str(nn)+'.txt'
@@ -71,27 +72,29 @@ class TURBID(data.Dataset):
                     labels.append(counter)
 
                     # perspective transform patch
-                    pts1 = np.float32([[0,0],[s,0],[0,s],[s,s]])
-                    pts2 = np.float32([[-random.randint(0,15),-random.randint(0,15)],[s+random.randint(0,15),-random.randint(0,15)],[-random.randint(0,15),s+random.randint(0,15)],[s+random.randint(0,15),s+random.randint(0,15)]])
-                    xmin=np.max((pts2[0,0],pts2[2,0]))
-                    xmax=np.min((pts2[1,0],pts2[3,0]))
-                    ymin=np.max((pts2[0,1],pts2[1,1]))
-                    ymax=np.min((pts2[2,1],pts2[3,1]))
-                    x_dif = (xmax-xmin)
-                    y_dif = (ymax-ymin)
-                    sz=np.min((x_dif,y_dif))
-                    transform = transforms.Compose([
-                        transforms.ToPILImage(),
-                        transforms.CenterCrop(sz),
-                        transforms.Resize(32)])
-                    M = cv2.getPerspectiveTransform(pts1,pts2)
-                    M[0, 2] -= xmin
-                    M[1, 2] -= ymin
-                    ptch = cv2.warpPerspective(ptch,M,(x_dif,y_dif))
-                    ptch = np.array(transform(ptch), dtype=np.uint8)
-                    ps.append(ptch)
-                    labels.append(counter)
-
+                    do_pers = random.random() > 0.5
+                    if do_pers:
+                        pts1 = np.float32([[0,0],[s,0],[0,s],[s,s]])
+                        pts2 = np.float32([[-random.randint(0,15),-random.randint(0,15)],[s+random.randint(0,15),-random.randint(0,15)],[-random.randint(0,15),s+random.randint(0,15)],[s+random.randint(0,15),s+random.randint(0,15)]])
+                        xmin=np.max((pts2[0,0],pts2[2,0]))
+                        xmax=np.min((pts2[1,0],pts2[3,0]))
+                        ymin=np.max((pts2[0,1],pts2[1,1]))
+                        ymax=np.min((pts2[2,1],pts2[3,1]))
+                        x_dif = (xmax-xmin)
+                        y_dif = (ymax-ymin)
+                        sz=np.min((x_dif,y_dif))
+                        transform = transforms.Compose([
+                            transforms.ToPILImage(),
+                            transforms.CenterCrop(sz),
+                            transforms.Resize(32)])
+                        M = cv2.getPerspectiveTransform(pts1,pts2)
+                        M[0, 2] -= xmin
+                        M[1, 2] -= ymin
+                        ptch = cv2.warpPerspective(ptch,M,(x_dif,y_dif))
+                        ptch = np.array(transform(ptch), dtype=np.uint8)
+                        ps.append(ptch)
+                        labels.append(counter)
+                    
                     # rotate patch
                     r = get_truncated_normal().rvs() # sample angles from normal distribution
                     M = cv2.getRotationMatrix2D((y,x), r, 1.0) # rotate about patch center
