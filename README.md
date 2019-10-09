@@ -1,4 +1,4 @@
-# Underwater image set for local features
+## Underwater image set for local features
 
 This is a collection of underwater images, sourced from the Sea-Thru dataset [1] and Mattia Ghilardi.
 
