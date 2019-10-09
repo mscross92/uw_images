@@ -28,7 +28,7 @@ class TURBID(data.Dataset):
         labels = []
         counter = 0
 
-        for nn in range(n_images):
+        for nn in range(1,n_images+1):
             imgs = []
 
             # load image
