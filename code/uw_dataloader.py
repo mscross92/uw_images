@@ -65,7 +65,7 @@ class TURBID(data.Dataset):
 
                     # original patch
                     ptch = gray[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)]
-                    if jj==0 or sds[jj]>4:
+                    if jj==0 or sds[abs(jj-1)]>4:
                         ptch_1 = cv2.resize(ptch, (32, 32))
                         ptch_1 = np.array(ptch_1, dtype=np.uint8)
                         ps.append(ptch_1)
