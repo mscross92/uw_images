@@ -41,7 +41,7 @@ class TURBID(data.Dataset):
             
             # get stack of blurred images
             # sds = np.linspace(1, 4, 8)
-            sds = get_truncated_normal(mean=0, sd=5, low=1, upp=10).rvs(4)
+            sds = get_truncated_normal(mean=0, sd=4.5, low=1, upp=8).rvs(3)
             for sd in sds:
                 blurred = cv2.GaussianBlur(gray,(21,21),sd)
                 imgs.append(blurred)
@@ -61,61 +61,62 @@ class TURBID(data.Dataset):
                 (y,x) = p.pt
                 s = p.size
                 
-                if s>20:
-                    for gray in imgs: # extract patches from original and each blurred image
-                        # original patch
-                        ptch = gray[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)]
+                for jj, gray in enumerate(imgs): # extract patches from original and each blurred image
+
+                    # original patch
+                    ptch = gray[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)]
+                    if jj==0 or sds[jj]>4:
                         ptch_1 = cv2.resize(ptch, (32, 32))
                         ptch_1 = np.array(ptch_1, dtype=np.uint8)
                         ps.append(ptch_1)
                         labels.append(counter)
 
-                        # perspective transform patch
-                        do_pers = random.random() > 0.5
-                        if do_pers:
-                            pts1 = np.float32([[0,0],[s,0],[0,s],[s,s]])
-                            pts2 = np.float32([[-random.randint(0,15),-random.randint(0,15)],[s+random.randint(0,15),-random.randint(0,15)],[-random.randint(0,15),s+random.randint(0,15)],[s+random.randint(0,15),s+random.randint(0,15)]])
-                            xmin=np.max((pts2[0,0],pts2[2,0]))
-                            xmax=np.min((pts2[1,0],pts2[3,0]))
-                            ymin=np.max((pts2[0,1],pts2[1,1]))
-                            ymax=np.min((pts2[2,1],pts2[3,1]))
-                            x_dif = (xmax-xmin)
-                            y_dif = (ymax-ymin)
-                            sz=np.min((x_dif,y_dif))
-                            transform = transforms.Compose([
-                                transforms.ToPILImage(),
-                                transforms.CenterCrop(sz),
-                                transforms.Resize(32)])
-                            M = cv2.getPerspectiveTransform(pts1,pts2)
-                            M[0, 2] -= xmin
-                            M[1, 2] -= ymin
-                            ptch = cv2.warpPerspective(ptch,M,(x_dif,y_dif))
-                            ptch = np.array(transform(ptch), dtype=np.uint8)
-                            ps.append(ptch)
-                            labels.append(counter)
-
-                        # rotate patch
-                        r = get_truncated_normal().rvs() # sample angles from normal distribution
-                        M = cv2.getRotationMatrix2D((y,x), r, 1.0) # rotate about patch center
-                        rotated = cv2.warpAffine(gray, M, (w, h))
-                        ptch = rotated[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)]
-                        ptch = cv2.resize(ptch, (32, 32))
-                        ptch = np.array(ptch, dtype=np.uint8)
+                    # perspective transform patch
+                    do_pers = random.random() > 0.5
+                    if do_pers:
+                        pts1 = np.float32([[0,0],[s,0],[0,s],[s,s]])
+                        pts2 = np.float32([[-random.randint(0,15),-random.randint(0,15)],[s+random.randint(0,15),-random.randint(0,15)],[-random.randint(0,15),s+random.randint(0,15)],[s+random.randint(0,15),s+random.randint(0,15)]])
+                        xmin=np.max((pts2[0,0],pts2[2,0]))
+                        xmax=np.min((pts2[1,0],pts2[3,0]))
+                        ymin=np.max((pts2[0,1],pts2[1,1]))
+                        ymax=np.min((pts2[2,1],pts2[3,1]))
+                        x_dif = (xmax-xmin)
+                        y_dif = (ymax-ymin)
+                        sz=np.min((x_dif,y_dif))
+                        transform = transforms.Compose([
+                            transforms.ToPILImage(),
+                            transforms.CenterCrop(sz),
+                            transforms.Resize(32)])
+                        M = cv2.getPerspectiveTransform(pts1,pts2)
+                        M[0, 2] -= xmin
+                        M[1, 2] -= ymin
+                        ptch = cv2.warpPerspective(ptch,M,(x_dif,y_dif))
+                        ptch = np.array(transform(ptch), dtype=np.uint8)
                         ps.append(ptch)
                         labels.append(counter)
 
-                    print(counter)
+                    # rotate patch
+                    r = get_truncated_normal().rvs() # sample angles from normal distribution
+                    M = cv2.getRotationMatrix2D((y,x), r, 1.0) # rotate about patch center
+                    rotated = cv2.warpAffine(gray, M, (w, h))
+                    ptch = rotated[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)]
+                    ptch = cv2.resize(ptch, (32, 32))
+                    ptch = np.array(ptch, dtype=np.uint8)
+                    ps.append(ptch)
+                    labels.append(counter)
 
-                    ps = np.array(ps)
-                    ps = ps.astype('uint8')                
-                    ps = torch.ByteTensor(ps).cuda()
+                ps = np.array(ps)
+                ps = ps.astype('uint8')                
+                ps = torch.ByteTensor(ps).cuda()
 
-                    if type(ptchs) == type(None):
-                        ptchs = ps
-                    else:
-                        ptchs = torch.cat([ptchs,ps], dim=0) # concat list of tensors
+                if type(ptchs) == type(None):
+                    ptchs = ps
+                else:
+                    ptchs = torch.cat([ptchs,ps], dim=0) # concat list of tensors
 
-                    counter += 1
+                counter += 1
+            
+            print('Current label counter:',counter)
 
                     
         print(len(ptchs),'patches created from',counter,'features and',nn,'images')
