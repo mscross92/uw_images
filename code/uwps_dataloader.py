@@ -34,7 +34,8 @@ class UWPS(data.Dataset):
                     patch = np.array(patch, dtype=np.uint8)
                     patches.append(patch)
                     labels.append(i+counter)
-                counter += n_patches
+                # counter += n_patches
+                counter += 1
         print(counter)
         return torch.ByteTensor(np.array(patches, dtype=np.uint8)), torch.LongTensor(labels)
 
