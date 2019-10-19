@@ -55,4 +55,4 @@ if __name__ == '__main__':
     images, labels = uw_patches.read_image_file(path_to_data_dir)
     with open(os.path.join(output_dir, 'train.pt'), 'wb') as f:
         torch.save((images, labels), f)
-    print(len(labels), 'patches from',len(np.unique(np.array(labels))),'sequences saved')
+    print(len(np.array(labels)), 'patches from',len(np.unique(np.array(labels))),'sequences saved')
