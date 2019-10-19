@@ -18,19 +18,23 @@ class UWPS(data.Dataset):
         patches = []
         labels = []
         counter = 0
-        hpatches_sequences = [x[1] for x in os.walk(data_dir)][0]
-        for directory in hpatches_sequences:
-            sequence_path = os.path.join(data_dir, directory)+'.png'
-            image = cv2.imread(sequence_path, 0)
-            h, w = image.shape
-            n_patches = int(h / w)
-            for i in range(n_patches):
-                patch = image[i * (w): (i + 1) * (w), 0:w]
-                patch = cv2.resize(patch, (32, 32))
-                patch = np.array(patch, dtype=np.uint8)
-                patches.append(patch)
-                labels.append(i+counter)
-            counter += n_patches
+        # hpatches_sequences = [x[1] for x in os.walk(data_dir)][0]
+        # for directory in hpatches_sequences:
+        directory = os.fsencode(data_dir)
+        for file in os.listdir(directory):
+            filename = os.fsdecode(file)
+            if filename.endswith(".png"):
+                sequence_path = os.path.join(data_dir, filename)
+                image = cv2.imread(sequence_path, 0)
+                h, w = image.shape
+                n_patches = int(h / w)
+                for i in range(n_patches):
+                    patch = image[i * (w): (i + 1) * (w), 0:w]
+                    patch = cv2.resize(patch, (32, 32))
+                    patch = np.array(patch, dtype=np.uint8)
+                    patches.append(patch)
+                    labels.append(i+counter)
+                counter += n_patches
         print(counter)
         return torch.ByteTensor(np.array(patches, dtype=np.uint8)), torch.LongTensor(labels)
 
