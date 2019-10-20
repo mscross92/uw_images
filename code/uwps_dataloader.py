@@ -44,7 +44,7 @@ class UWPS(data.Dataset):
                 # counter += n_patches
                 counter += 1
         print(counter)
-        return torch.ByteTensor(np.array(patches, dtype=np.uint8)), torch.LongTensor(labels)
+        # return torch.ByteTensor(np.array(patches, dtype=np.uint8)), torch.LongTensor(labels)
         return patches, torch.LongTensor(labels)
 
 if __name__ == '__main__':
