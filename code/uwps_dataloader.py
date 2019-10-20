@@ -53,6 +53,9 @@ class UWPS(data.Dataset):
                     print(counter)
                 counter += 1
 
+                if counter==5000:
+                    break
+
         # return torch.ByteTensor(np.array(patches, dtype=np.uint8)), torch.LongTensor(labels)
         return patches, torch.LongTensor(labels)
 
