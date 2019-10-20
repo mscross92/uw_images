@@ -34,7 +34,7 @@ class UWPS(data.Dataset):
                     patch = cv2.resize(patch, (32, 32))
 
                     patch = np.array(patch, dtype=np.uint8)
-                    ps = torch.ByteTensor(ps).cuda()
+                    patch = torch.ByteTensor(patch).cuda()
                     if type(patches) == type(None):
                         patches = patch
                     else:
