@@ -29,21 +29,30 @@ class UWPS(data.Dataset):
                 image = cv2.imread(sequence_path, 0)
                 h, w = image.shape
                 n_patches = int(h / w)
+                ps = []
                 for i in range(n_patches):
                     patch = image[i * (w): (i + 1) * (w), 0:w]
                     patch = cv2.resize(patch, (32, 32))
 
                     patch = np.array(patch, dtype=np.uint8)
-                    patch = torch.ByteTensor(patch).cuda()
-                    if type(patches) == type(None):
-                        patches = patch
-                    else:
-                        patches = torch.cat([patches,patch], dim=0) # concat list of tensors
+                    ps.append(patch)
                     # patches.append(patch)
                     labels.append(counter)
                 # counter += n_patches
+
+                ps = np.array(ps)
+                ps = ps.astype('uint8')                
+                ps = torch.ByteTensor(ps).cuda()
+
+                if type(patches) == type(None):
+                    patches = ps
+                else:
+                    patches = torch.cat([patches,ps], dim=0) # concat list of tensors
+
+                if counter%1000==0:
+                    print(counter)
                 counter += 1
-        print(counter)
+
         # return torch.ByteTensor(np.array(patches, dtype=np.uint8)), torch.LongTensor(labels)
         return patches, torch.LongTensor(labels)
 
