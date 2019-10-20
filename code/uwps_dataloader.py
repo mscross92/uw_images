@@ -15,7 +15,8 @@ class UWPS(data.Dataset):
     def read_image_file(self, data_dir):
         """Return a Tensor containing the patches
         """
-        patches = []
+        # patches = []
+        patches = None
         labels = []
         counter = 0
         # hpatches_sequences = [x[1] for x in os.walk(data_dir)][0]
@@ -31,9 +32,15 @@ class UWPS(data.Dataset):
                 for i in range(n_patches):
                     patch = image[i * (w): (i + 1) * (w), 0:w]
                     patch = cv2.resize(patch, (32, 32))
+
                     patch = np.array(patch, dtype=np.uint8)
-                    patches.append(patch)
-                    labels.append(i+counter)
+                    ps = torch.ByteTensor(ps).cuda()
+                    if type(patches) == type(None):
+                        patches = patch
+                    else:
+                        patches = torch.cat([patches,patch], dim=0) # concat list of tensors
+                    # patches.append(patch)
+                    labels.append(counter)
                 # counter += n_patches
                 counter += 1
         print(counter)
