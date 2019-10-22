@@ -49,7 +49,7 @@ class UWPS(data.Dataset):
                 else:
                     patches = torch.cat([patches,ps], dim=0) # concat list of tensors
 
-                if counter%1000==0:
+                if counter%5000==0:
                     print(counter)
                 counter += 1
 
