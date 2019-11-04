@@ -26,8 +26,8 @@ class UWPS(data.Dataset):
             filename = os.fsdecode(file)
             if filename.endswith(".png"):
 
-                if counter > 3500:
-                    break
+                # if counter > 3500:
+                #     break
 
                 sequence_path = os.path.join(data_dir, filename)
                 image = cv2.imread(sequence_path, 0)
