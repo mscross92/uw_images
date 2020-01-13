@@ -60,8 +60,8 @@ if __name__ == '__main__':
     # need to be specified
     try:
         path_to_patches_dir = sys.argv[1]
-        output_dir  = sys.argv[3]
-        val_set_path  = sys.argv[4]
+        output_dir  = sys.argv[2]
+        val_set_path  = sys.argv[3]
     except:
         print("Wrong input format.")
         sys.exit(1)
