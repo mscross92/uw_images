@@ -42,18 +42,18 @@ class TurbidPatches(data.Dataset):
                         patch = cv2.resize(patch, (32, 32))
                         patch = np.array(patch, dtype=np.uint8)
                         patches.append(patch)
-                        labels.append(i+counter)
+                        labels.append(i)
                 else:
                     if i in val_p:
                         patch = image[i * (w): (i + 1) * (w), 0:w]
                         patch = cv2.resize(patch, (32, 32))
                         patch = np.array(patch, dtype=np.uint8)
                         patches.append(patch)
-                        labels.append(i+counter)
+                        labels.append(i)
 
             counter += n_patches
                 
-        print(counter)
+        print(counter,'patches from',i,'classes')
         return torch.ByteTensor(np.array(patches, dtype=np.uint8)), torch.LongTensor(labels)
 
 
