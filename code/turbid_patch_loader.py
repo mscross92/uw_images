@@ -27,7 +27,7 @@ class TurbidPatches(data.Dataset):
         counter = 0
         for nn in types:
             # load patch sprite for included image type
-            sequence_path = os.path.join(data_dir, '/',str(nn))+'.png'
+            sequence_path = data_dir + '/' + str(nn) + '.png'
             print(sequence_path)
             image = cv2.imread(sequence_path, 0)
             h, w = image.shape
